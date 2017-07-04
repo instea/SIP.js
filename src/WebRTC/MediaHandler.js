@@ -558,8 +558,17 @@ MediaHandler.prototype = Object.create(SIP.MediaHandler.prototype, {
         }
         return deferred.promise;
       })
-      .then(function readySuccess () {
-        var sdp = pc.localDescription.sdp;
+      .then(function shouldAppendIceToSdp() {
+        // add ice candidates if not in sdp (from re-created offer/answer)
+        if (pc.localDescription.sdp.indexOf('candidate') < 0) {
+          return SIP.Utils.promisify(pc, methodName, true)(constraints)
+            .then(function(sdp){
+              return sdp.sdp;
+            });
+        }
+      })
+      .then(function readySuccess (sdp) {
+        sdp = sdp || pc.localDescription.sdp;
 
         sdp = SIP.Hacks.Chrome.needsExplicitlyInactiveSDP(sdp);
         sdp = SIP.Hacks.AllBrowsers.unmaskDtls(sdp);
