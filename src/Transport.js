@@ -3,6 +3,8 @@
  * @fileoverview Transport
  */
 
+var util = require('util');
+
 /**
  * @augments SIP
  * @class Transport
@@ -344,7 +346,7 @@ Transport.prototype = {
   * @param {event} e
   */
   onError: function(e) {
-    this.logger.warn('WebSocket connection error: ' + JSON.stringify(e));
+    this.logger.warn('WebSocket connection error: ' + util.inspect(e, { depth: 3 }));
   },
 
   /**
